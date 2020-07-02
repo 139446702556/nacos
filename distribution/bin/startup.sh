@@ -138,6 +138,7 @@ if [ ! -f "${BASE_DIR}/logs/start.out" ]; then
   touch "${BASE_DIR}/logs/start.out"
 fi
 # start
-echo "$JAVA ${JAVA_OPT}" > ${BASE_DIR}/logs/start.out 2>&1 &
-nohup $JAVA ${JAVA_OPT} nacos.nacos >> ${BASE_DIR}/logs/start.out 2>&1 &
+JAVA_DEBUG_OPTS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=6666,server=y,suspend=n"
+echo ${JAVA_DEBUG_OPTS} "$JAVA ${JAVA_OPT}" > ${BASE_DIR}/logs/start.out 2>&1 &
+nohup ${JAVA_DEBUG_OPTS} $JAVA ${JAVA_OPT} nacos.nacos >> ${BASE_DIR}/logs/start.out 2>&1 &
 echo "nacos is starting，you can check the ${BASE_DIR}/logs/start.out"
