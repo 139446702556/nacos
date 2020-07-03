@@ -71,7 +71,7 @@ public class IoUtils {
             }
         }
     }
-
+    /**根据给定的读取器，读取出其每一行数据，并返回*/
     static public List<String> readLines(Reader input) throws IOException {
         BufferedReader reader = toBufferedReader(input);
         List<String> list = new ArrayList<String>();

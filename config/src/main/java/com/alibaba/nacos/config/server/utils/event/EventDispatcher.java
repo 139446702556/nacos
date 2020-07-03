@@ -112,10 +112,10 @@ public class EventDispatcher {
     static private final Logger log = LoggerFactory.getLogger(EventDispatcher.class);
 
     static final CopyOnWriteArrayList<Entry> LISTENER_HUB = new CopyOnWriteArrayList<Entry>();
-
+    /**事件定义接口，所有事件都继承这个空接口*/
     public interface Event {
     }
-
+    /**抽象事件监听器，每个监听器都需要实现它的onEvent方法和interest方法*/
     static public abstract class AbstractEventListener {
 
         public AbstractEventListener() {
@@ -126,7 +126,7 @@ public class EventDispatcher {
         }
 
         /**
-         * 感兴趣的事件列表
+         * 感兴趣的事件列表（将要监听的事件列表）
          *
          * @return event list
          */

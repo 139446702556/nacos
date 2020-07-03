@@ -30,7 +30,7 @@ import static com.alibaba.nacos.config.server.utils.LogUtil.fatalLog;
 
 /**
  * Switch
- *
+ * 开关类
  * @author Nacos
  */
 @Service
@@ -45,7 +45,7 @@ public class SwitchService {
     public static final String DISABLE_APP_COLLECTOR = "disableAppCollector";
 
     private static volatile Map<String, String> switches = new HashMap<String, String>();
-
+    /**获取指定开关的配置，如果未设置，则直接返回defaultValue*/
     public static boolean getSwitchBoolean(String key, boolean defaultValue) {
         boolean rtn = defaultValue;
         try {
@@ -74,8 +74,9 @@ public class SwitchService {
         String value = switches.get(key);
         return StringUtils.isBlank(value) ? defaultValue : value;
     }
-
+    /**加载配置，储存各种的开关配置  传入的config应该是一个多行的数据*/
     public static void load(String config) {
+        //如果config为空，则表示没有设置配置，无需加载，直接记录异常，终止执行
         if (StringUtils.isBlank(config)) {
             fatalLog.error("switch config is blank.");
             return;
@@ -84,20 +85,24 @@ public class SwitchService {
 
         Map<String, String> map = new HashMap<String, String>(30);
         try {
+            //遍历所有的配置（一行一行遍历）
             for (String line : IoUtils.readLines(new StringReader(config))) {
+                //如果此行配置不是空，并且不是以#号开头（有效配置，因为#号开头的是被注释掉的）
                 if (!StringUtils.isBlank(line) && !line.startsWith("#")) {
+                    //根据等号进行切分出key和value
                     String[] array = line.split("=");
-
+                    //如果配置有问题（不是a=b这种类型格式均是无效的），则进行报警，并忽略此条继续处理后面
                     if (array == null || array.length != 2) {
                         LogUtil.fatalLog.error("corrupt switch record {}", line);
                         continue;
                     }
-
+                    //将此条配置加入到map缓存中
                     String key = array[0].trim();
                     String value = array[1].trim();
 
                     map.put(key, value);
                 }
+                //将map设置到switches中
                 switches = map;
                 fatalLog.warn("[reload-switches] {}", getSwitches());
             }

@@ -40,7 +40,7 @@ import static com.alibaba.nacos.config.server.utils.LogUtil.pullLog;
 
 /**
  * 长轮询服务。负责处理
- *
+ * 此事件监听器只负责处理LocalDataChangeEvent类型的事件，其它的会直接忽略
  * @author Nacos
  */
 @Service
@@ -55,7 +55,7 @@ public class LongPollingService extends AbstractEventListener {
     private static final String TRUE_STR = "true";
 
     private Map<String, Long> retainIps = new ConcurrentHashMap<String, Long>();
-
+    /**是否为固定轮训类型，默认为false*/
     private static boolean isFixedPolling() {
         return SwitchService.getSwitchBoolean(SwitchService.FIXED_POLLING, false);
     }
@@ -247,7 +247,7 @@ public class LongPollingService extends AbstractEventListener {
         scheduler.execute(
             new ClientLongPolling(asyncContext, clientMd5Map, ip, probeRequestSize, timeout, appName, tag));
     }
-
+    /**将要监听的事件列表，此监听器只监听LocalDataChangeEvent这一个类型的事件*/
     @Override
     public List<Class<? extends Event>> interest() {
         List<Class<? extends Event>> eventTypes = new ArrayList<Class<? extends Event>>();
@@ -257,11 +257,14 @@ public class LongPollingService extends AbstractEventListener {
 
     @Override
     public void onEvent(Event event) {
+        //此处默认为false 不会走
         if (isFixedPolling()) {
             // ignore
         } else {
+            //如果要处理的事件是LocalDataChangeEvent类型的，则进行处理
             if (event instanceof LocalDataChangeEvent) {
                 LocalDataChangeEvent evt = (LocalDataChangeEvent)event;
+                //使用线程池进行处理当前发生的事件对应的任务
                 scheduler.execute(new DataChangeTask(evt.groupKey, evt.isBeta, evt.betaIps));
             }
         }
@@ -300,7 +303,7 @@ public class LongPollingService extends AbstractEventListener {
     final Queue<ClientLongPolling> allSubs;
 
     // =================
-
+    /**数据发生改变时的任务类*/
     class DataChangeTask implements Runnable {
         @Override
         public void run() {
