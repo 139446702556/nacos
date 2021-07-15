@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 
 /**
  * All parameter validation tools
- *
+ *  参数校验工具
  * @author <a href="mailto:liaochuntao@live.com">liaochuntao</a>
  */
 public final class ValidatorUtils {
@@ -34,7 +34,9 @@ public final class ValidatorUtils {
 	private static final Pattern IP_MATCH = Pattern.compile("([^\\/:]+)(:\\d+)");
 
 	public static void checkInitParam(Properties properties) {
+	    //校验ip格式
 		checkServerAddr(properties.getProperty(PropertyKeyConst.SERVER_ADDR));
+		//校验context path
 		checkContextPath(properties.getProperty(PropertyKeyConst.CONTEXT_PATH));
 	}
 

@@ -38,14 +38,14 @@ public class InitUtils {
     /**
      * Add a difference to the name naming. This method simply initializes the namespace for Naming.
      * Config initialization is not the same, so it cannot be reused directly.
-     *
+     * 通过命名来初始化命名空间信息
      * @param properties
      * @return
      */
     public static String initNamespaceForNaming(Properties properties) {
         String tmpNamespace = null;
 
-
+        //是否自动解析namespace （先从属性中获取，没有则从系统属性中获取，都没有默认为true）
         String isUseCloudNamespaceParsing =
             properties.getProperty(PropertyKeyConst.IS_USE_CLOUD_NAMESPACE_PARSING,
                 System.getProperty(SystemPropertyKeyConst.IS_USE_CLOUD_NAMESPACE_PARSING,

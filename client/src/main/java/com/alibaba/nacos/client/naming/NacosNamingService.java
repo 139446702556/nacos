@@ -84,6 +84,7 @@ public class NacosNamingService implements NamingService {
     }
 
     private void init(Properties properties) {
+        //校验参数合法性
         ValidatorUtils.checkInitParam(properties);
         namespace = InitUtils.initNamespaceForNaming(properties);
         InitUtils.initSerialization();
