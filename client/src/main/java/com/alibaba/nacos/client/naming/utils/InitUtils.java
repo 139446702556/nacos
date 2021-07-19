@@ -45,14 +45,14 @@ public class InitUtils {
     public static String initNamespaceForNaming(Properties properties) {
         String tmpNamespace = null;
 
-        //是否自动解析namespace （先从属性中获取，没有则从系统属性中获取，都没有默认为true）
+        //是否自动解析云端的namespace（先从属性中获取，没有则从系统属性中获取，都没有默认为true）
         String isUseCloudNamespaceParsing =
             properties.getProperty(PropertyKeyConst.IS_USE_CLOUD_NAMESPACE_PARSING,
                 System.getProperty(SystemPropertyKeyConst.IS_USE_CLOUD_NAMESPACE_PARSING,
                     String.valueOf(Constants.DEFAULT_USE_CLOUD_NAMESPACE_PARSING)));
 
         if (Boolean.parseBoolean(isUseCloudNamespaceParsing)) {
-
+            // 获取ans云上的namespace属性设置 (先从系统属性中获取，再从环境变量中获取)
             tmpNamespace = TenantUtil.getUserTenantForAns();
             tmpNamespace = TemplateUtils.stringEmptyAndThenExecute(tmpNamespace, new Callable<String>() {
                 @Override
@@ -72,7 +72,7 @@ public class InitUtils {
                 }
             });
         }
-
+        // 获取namespace系统属性
         tmpNamespace = TemplateUtils.stringEmptyAndThenExecute(tmpNamespace, new Callable<String>() {
             @Override
             public String call() {
@@ -81,11 +81,11 @@ public class InitUtils {
                 return namespace;
             }
         });
-
+        // 从给定自定义属性中获取
         if (StringUtils.isEmpty(tmpNamespace) && properties != null) {
             tmpNamespace = properties.getProperty(PropertyKeyConst.NAMESPACE);
         }
-
+        // 如果均为设置，则namespace默认为public
         tmpNamespace = TemplateUtils.stringEmptyAndThenExecute(tmpNamespace, new Callable<String>() {
             @Override
             public String call() {
@@ -97,6 +97,7 @@ public class InitUtils {
 
     public static void initWebRootContext() {
         // support the web context with ali-yun if the app deploy by EDAS
+        //获取webcontext设置，如果设置了则初始化覆盖默认值（request url root）
         final String webContext = System.getProperty(SystemPropertyKeyConst.NAMING_WEB_CONTEXT);
         TemplateUtils.stringNotEmptyAndThenExecute(webContext, new Runnable() {
             @Override
@@ -111,11 +112,13 @@ public class InitUtils {
     }
 
     public static String initEndpoint(final Properties properties) {
+        //properties检查
         if (properties == null) {
 
             return "";
         }
         // Whether to enable domain name resolution rules
+        // 是否启用域名解析规则（获取顺序给定properties参数、系统属性、默认为true）
         String isUseEndpointRuleParsing =
             properties.getProperty(PropertyKeyConst.IS_USE_ENDPOINT_PARSING_RULE,
                 System.getProperty(SystemPropertyKeyConst.IS_USE_ENDPOINT_PARSING_RULE,
@@ -123,8 +126,10 @@ public class InitUtils {
 
         boolean isUseEndpointParsingRule = Boolean.parseBoolean(isUseEndpointRuleParsing);
         String endpointUrl;
+        //启用则进行域名解析，无法解析则返回空
         if (isUseEndpointParsingRule) {
             // Get the set domain name information
+            //解析指定域名信息来获取endpoint信息（域名格式：${aa:bb}）
             endpointUrl = ParamUtil.parsingEndpointRule(properties.getProperty(PropertyKeyConst.ENDPOINT));
             if (StringUtils.isBlank(endpointUrl)) {
                 return "";
@@ -136,7 +141,7 @@ public class InitUtils {
         if (StringUtils.isBlank(endpointUrl)) {
             return "";
         }
-
+        //获取顺序：环境变量（默认key）、给定属性中、默认为8080
         String endpointPort = TemplateUtils.stringEmptyAndThenExecute(System.getenv(PropertyKeyConst.SystemEnv.ALIBABA_ALIWARE_ENDPOINT_PORT), new Callable<String>() {
             @Override
             public String call() {
@@ -157,7 +162,7 @@ public class InitUtils {
 
     /**
      * Register subType for serialization
-     *
+     * 向jackson中注册用于序列化的子类型
      * Now these subType implementation class has registered in static code.
      * But there are some problem for classloader. The implementation class
      * will be loaded when they are used, which will make deserialize
@@ -169,6 +174,7 @@ public class InitUtils {
      */
     public static void initSerialization() {
         // TODO register in implementation class or remove subType
+        // 注入用于反序列化的子类型映射（与JsonSubTypes注解功能对等，与JsonTypeInfo共同使用）
         JacksonUtils.registerSubtype(NoneSelector.class, SelectorType.none.name());
         JacksonUtils.registerSubtype(ExpressionSelector.class, SelectorType.label.name());
     }

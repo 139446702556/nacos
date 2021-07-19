@@ -86,8 +86,11 @@ public class NacosNamingService implements NamingService {
     private void init(Properties properties) {
         //校验参数合法性
         ValidatorUtils.checkInitParam(properties);
+        //按照系统属性、系统环境、给定属性变量顺序获取namespace，默认为public
         namespace = InitUtils.initNamespaceForNaming(properties);
+        //向jackson中注册用于反序列化的子类型
         InitUtils.initSerialization();
+        //初始化服务地址（从给定属性、系统属性、环境变量以及默认值来获得）
         initServerAddr(properties);
         InitUtils.initWebRootContext();
         initCacheDir();
@@ -128,7 +131,7 @@ public class NacosNamingService implements NamingService {
 
         return loadCacheAtStart;
     }
-
+    //初始化服务地址（优先使用endpoint，若无则使用serverAddr）；endpoint只能设置单节点
     private void initServerAddr(Properties properties) {
         serverList = properties.getProperty(PropertyKeyConst.SERVER_ADDR);
         endpoint = InitUtils.initEndpoint(properties);

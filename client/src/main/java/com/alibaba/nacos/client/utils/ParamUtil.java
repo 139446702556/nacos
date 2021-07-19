@@ -188,6 +188,7 @@ public class ParamUtil {
 
     public static String parsingEndpointRule(String endpointUrl) {
         // 配置文件中输入的话，以 ENV 中的优先，
+        //检测给定节点信息无效，则从环境变量中获取并返回
         if (endpointUrl == null
             || !PATTERN.matcher(endpointUrl).find()) {
             // skip retrieve from system property and retrieve directly from system env
@@ -198,7 +199,7 @@ public class ParamUtil {
 
             return StringUtils.isNotBlank(endpointUrl) ? endpointUrl : "";
         }
-
+        //解析endpoint设置（格式：${aa:bb}）
         endpointUrl = endpointUrl.substring(endpointUrl.indexOf("${") + 2,
             endpointUrl.lastIndexOf("}"));
         int defStartOf = endpointUrl.indexOf(":");
@@ -207,7 +208,7 @@ public class ParamUtil {
             defaultEndpointUrl = endpointUrl.substring(defStartOf + 1);
             endpointUrl = endpointUrl.substring(0, defStartOf);
         }
-
+        //值获取优先顺序：系统属性（指定key）、环境变量（指定key）、环境变量（默认key）、默认值
         String endpointUrlSource = TemplateUtils.stringBlankAndThenExecute(System.getProperty(endpointUrl,
             System.getenv(endpointUrl)), new Callable<String>() {
             @Override

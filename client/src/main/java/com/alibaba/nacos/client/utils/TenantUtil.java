@@ -27,6 +27,7 @@ public class TenantUtil {
     private static String userTenant;
 
     static {
+        //从系统属性中获取tenant.id属性，默认为空
         userTenant = System.getProperty("tenant.id", "");
     }
 
@@ -51,12 +52,13 @@ public class TenantUtil {
 
     /**
      * Adapt the way ANS gets tenant on the cloud.
+     * 适应ANS在云上获得租户的方式。
      *
      * @return
      */
     public static String getUserTenantForAns() {
         String tmp = userTenant;
-
+        //使用ans.namespace系统属性
         if (StringUtils.isBlank(userTenant)) {
             tmp = System.getProperty("ans.namespace");
         }

@@ -30,6 +30,7 @@ public abstract class AbstractSelector {
 
     /**
      * The type of this selector, each child class should announce its own unique type.
+     * 用于标识jackson反序列化时的子类类型
      */
     @JsonIgnore
     private final String type;
