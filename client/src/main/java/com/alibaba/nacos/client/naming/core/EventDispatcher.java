@@ -42,7 +42,7 @@ public class EventDispatcher {
         = new ConcurrentHashMap<String, List<EventListener>>();
 
     public EventDispatcher() {
-
+        //初始化单线程线程池（全部线程均为后台线程）
         executor = Executors.newSingleThreadExecutor(new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -52,7 +52,7 @@ public class EventDispatcher {
                 return thread;
             }
         });
-
+        //启动通知者，对服务变化信息进行监听
         executor.execute(new Notifier());
     }
 
@@ -108,11 +108,12 @@ public class EventDispatcher {
 
         changedServices.add(serviceInfo);
     }
-
+    //通知者，用于监听发布的serverInfo事件，触发监听者对应操作
     private class Notifier implements Runnable {
         @Override
         public void run() {
             while (true) {
+                // 获取服务改变信息
                 ServiceInfo serviceInfo = null;
                 try {
                     serviceInfo = changedServices.poll(5, TimeUnit.MINUTES);
@@ -122,7 +123,7 @@ public class EventDispatcher {
                 if (serviceInfo == null) {
                     continue;
                 }
-
+                // 获取监听者，并将服务信息发送过去
                 try {
                     List<EventListener> listeners = observerMap.get(serviceInfo.getKey());
 

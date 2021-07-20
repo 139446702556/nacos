@@ -92,10 +92,13 @@ public class NacosNamingService implements NamingService {
         InitUtils.initSerialization();
         //初始化服务地址（从给定属性、系统属性、环境变量以及默认值来获得）
         initServerAddr(properties);
+        //根据指定系统属性初始化web url的跟路径
         InitUtils.initWebRootContext();
+        //初始化缓存namespace下的路由地址信息文件路径
         initCacheDir();
+        //初始化log路径
         initLogName(properties);
-
+        //初始化事件调度器
         eventDispatcher = new EventDispatcher();
         serverProxy = new NamingProxy(namespace, endpoint, serverList, properties);
         beatReactor = new BeatReactor(serverProxy, initClientBeatThreadCount(properties));
