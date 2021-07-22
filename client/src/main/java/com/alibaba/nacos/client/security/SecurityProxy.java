@@ -77,7 +77,7 @@ public class SecurityProxy {
 
     /**
      * Construct from properties, keeping flexibility
-     *
+     * 从给定属性中获取鉴权相关信息
      * @param properties a bunch of properties to read
      */
     public SecurityProxy(Properties properties) {

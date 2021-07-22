@@ -65,7 +65,7 @@ public class HostReactor {
 
     public HostReactor(EventDispatcher eventDispatcher, NamingProxy serverProxy, String cacheDir,
                        boolean loadCacheAtStart, int pollingThreadCount) {
-
+        //  创建轮询线程池
         executor = new ScheduledThreadPoolExecutor(pollingThreadCount, new ThreadFactory() {
             @Override
             public Thread newThread(Runnable r) {
@@ -79,6 +79,7 @@ public class HostReactor {
         this.eventDispatcher = eventDispatcher;
         this.serverProxy = serverProxy;
         this.cacheDir = cacheDir;
+        // 初始化服务路由信息（从执行缓存文件中）
         if (loadCacheAtStart) {
             this.serviceInfoMap = new ConcurrentHashMap<String, ServiceInfo>(DiskCache.read(this.cacheDir));
         } else {

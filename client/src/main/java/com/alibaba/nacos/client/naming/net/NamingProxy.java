@@ -87,12 +87,15 @@ public class NamingProxy {
     private Properties properties;
 
     public NamingProxy(String namespaceId, String endpoint, String serverList, Properties properties) {
-
+        // 初始化鉴权相关信息
         securityProxy = new SecurityProxy(properties);
+
         this.properties = properties;
+        // 设置服务端口，默认为8848
         this.setServerPort(DEFAULT_SERVER_PORT);
         this.namespaceId = namespaceId;
         this.endpoint = endpoint;
+        // 初始化服务地址和nacos基础域
         if (StringUtils.isNotEmpty(serverList)) {
             this.serverList = Arrays.asList(serverList.split(","));
             if (this.serverList.size() == 1) {
@@ -576,7 +579,7 @@ public class NamingProxy {
 
     public void setServerPort(int serverPort) {
         this.serverPort = serverPort;
-
+        // 从系统属性中获取服务端口信息
         String sp = System.getProperty(SystemPropertyKeyConst.NAMING_SERVER_PORT);
         if (StringUtils.isNotBlank(sp)) {
             this.serverPort = Integer.parseInt(sp);

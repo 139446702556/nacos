@@ -100,12 +100,14 @@ public class NacosNamingService implements NamingService {
         initLogName(properties);
         //初始化事件调度器
         eventDispatcher = new EventDispatcher();
+        // 创建服务相关信息对象
         serverProxy = new NamingProxy(namespace, endpoint, serverList, properties);
+        // 初始化服务信息和心跳线程池
         beatReactor = new BeatReactor(serverProxy, initClientBeatThreadCount(properties));
         hostReactor = new HostReactor(eventDispatcher, serverProxy, cacheDir, isLoadCacheAtStart(properties),
             initPollingThreadCount(properties));
     }
-
+    // 从给定属性中获取初始化客户端线程个数，默认为处理器核心数大于1是核心数一半，否则为1
     private int initClientBeatThreadCount(Properties properties) {
         if (properties == null) {
             return UtilAndComs.DEFAULT_CLIENT_BEAT_THREAD_COUNT;
@@ -114,7 +116,7 @@ public class NacosNamingService implements NamingService {
         return NumberUtils.toInt(properties.getProperty(PropertyKeyConst.NAMING_CLIENT_BEAT_THREAD_COUNT),
             UtilAndComs.DEFAULT_CLIENT_BEAT_THREAD_COUNT);
     }
-
+    // 从属性中获取轮询线程个数，默认为核心数一半或者1
     private int initPollingThreadCount(Properties properties) {
         if (properties == null) {
 
@@ -124,7 +126,7 @@ public class NacosNamingService implements NamingService {
         return NumberUtils.toInt(properties.getProperty(PropertyKeyConst.NAMING_POLLING_THREAD_COUNT),
             UtilAndComs.DEFAULT_POLLING_THREAD_COUNT);
     }
-
+    // 从属性中获取启动时是否加载路由缓存信息开关，默认为不加载
     private boolean isLoadCacheAtStart(Properties properties) {
         boolean loadCacheAtStart = false;
         if (properties != null && StringUtils.isNotEmpty(properties.getProperty(PropertyKeyConst.NAMING_LOAD_CACHE_AT_START))) {
